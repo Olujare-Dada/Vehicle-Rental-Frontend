@@ -56,13 +56,13 @@ function Chatbot() {
             
             // Prepare context with user information and JWT token
             const context = {
-              user: {
-                username: "${user?.username || 'unknown'}",
-                firstName: "${user?.firstName || 'unknown'}",
-                lastName: "${user?.lastName || 'unknown'}",
-                email: "${user?.email || 'unknown'}",
-                id: "${user?.id || 'unknown'}"
-              },
+                             user: {
+                 username: '${user?.username || 'unknown'}',
+                 firstName: '${user?.firstName || 'unknown'}',
+                 lastName: '${user?.lastName || 'unknown'}',
+                 email: '${user?.email || 'unknown'}',
+                 id: '${user?.id || 'unknown'}'
+               },
               auth: {
                 token: token || 'no-token',
                 isAuthenticated: !!token
@@ -71,23 +71,23 @@ function Chatbot() {
                 timestamp: new Date().toISOString(),
                 userAgent: navigator.userAgent
               },
-              // API endpoints for chatbot to use
-              api: {
-                fleet: "${API_ENDPOINTS.fleet}",
-                fleetAvailable: "${API_ENDPOINTS.fleetAvailable}",
-                profile: "${API_ENDPOINTS.profileByUsername}",
-                balance: "${API_ENDPOINTS.balance}",
-                balanceAdd: "${API_ENDPOINTS.balanceAdd}",
-                balanceDebit: "${API_ENDPOINTS.balanceDebit}",
-                lateFees: "${API_ENDPOINTS.lateFeesUser}",
-                lateFeesPay: "${API_ENDPOINTS.lateFeesPay}",
-              },
+                             // API endpoints for chatbot to use
+               api: {
+                 fleet: '${API_ENDPOINTS.fleet}',
+                 fleetAvailable: '${API_ENDPOINTS.fleetAvailable}',
+                 profile: '${API_ENDPOINTS.profileByUsername}',
+                 balance: '${API_ENDPOINTS.balance}',
+                 balanceAdd: '${API_ENDPOINTS.balanceAdd}',
+                 balanceDebit: '${API_ENDPOINTS.balanceDebit}',
+                 lateFees: '${API_ENDPOINTS.lateFeesUser}',
+                 lateFeesPay: '${API_ENDPOINTS.lateFeesPay}',
+               },
               // Helper functions for chatbot to use with JWT authentication
               helpers: {
-                getFleetData: async (page = 0, size = 10) => {
-                  try {
-                    const token = localStorage.getItem("jwtToken");
-                    const response = await fetch("${API_ENDPOINTS.fleetAvailable}?page=" + page + "&size=" + size, {
+                                 getFleetData: async (page = 0, size = 10) => {
+                   try {
+                     const token = localStorage.getItem("jwtToken");
+                     const response = await fetch('${API_ENDPOINTS.fleetAvailable}?page=' + page + '&size=' + size, {
                       headers: {
                         'Authorization': 'Bearer ' + token,
                         'Content-Type': 'application/json'
@@ -148,18 +148,18 @@ function Chatbot() {
                 inputIconPosition: 'left',
                 inputIconSize: 20,
               },
-              launch: {
-                event: {
-                  type: 'launch',
-                  payload: {
-                    user_name: "${user?.username || 'unknown'}",
-                    user_email: "${user?.email || 'unknown'}",
-                    user_first_name: "${user?.firstName || 'unknown'}",
-                    user_last_name: "${user?.lastName || 'unknown'}",
-                    user_id: "${user?.id || 'unknown'}"
-                  }
-                }
-              }
+                               launch: {
+                   event: {
+                     type: 'launch',
+                     payload: {
+                       user_name: '${user?.username || 'unknown'}',
+                       user_email: '${user?.email || 'unknown'}',
+                       user_first_name: '${user?.firstName || 'unknown'}',
+                       user_last_name: '${user?.lastName || 'unknown'}',
+                       user_id: '${user?.id || 'unknown'}'
+                     }
+                   }
+                 }
             });
           }
           v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
