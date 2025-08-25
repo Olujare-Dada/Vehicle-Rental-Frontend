@@ -43,13 +43,7 @@ declare global {
 function Chatbot() {
   const { user } = useAuth()
   
-  // Get JWT token from localStorage (as per your requirement)
-  const getJwtToken = () => {
-    return localStorage.getItem("jwtToken");
-  };
-  
   useEffect(() => {
-
     // Use the official Voiceflow script
     const script = document.createElement('script')
     script.type = 'text/javascript'
@@ -105,7 +99,6 @@ function Chatbot() {
                       throw new Error('HTTP ' + response.status);
                     }
                   } catch (error) {
-                    console.error('Error fetching fleet data:', error);
                     return { error: error instanceof Error ? error.message : 'Unknown error' };
                   }
                 },
@@ -127,14 +120,11 @@ function Chatbot() {
                       throw new Error('HTTP ' + response.status);
                     }
                   } catch (error) {
-                    console.error('API call error:', error);
                     return { error: error instanceof Error ? error.message : 'Unknown error' };
                   }
                 }
               }
             };
-
-    
 
             window.voiceflow.chat.load({
               verify: { projectID: '6897b9430a2a1fc690da3cde' },
@@ -176,7 +166,6 @@ function Chatbot() {
   const updateChatbotContext = (newContext: any) => {
     if (window.voiceflow?.chat?.updateContext) {
       window.voiceflow.chat.updateContext(newContext);
-      
     }
   };
 
@@ -196,7 +185,6 @@ function Chatbot() {
         throw new Error(`HTTP ${response.status}`);
       }
     } catch (error) {
-      console.error('Error fetching fleet data:', error);
       return { error: error instanceof Error ? error.message : 'Unknown error' };
     }
   };
@@ -240,12 +228,30 @@ export default function Page() {
               <Link href="/balance" className="text-sm font-medium hover:text-blue-600 transition-colors">
                 Balance
               </Link>
-              <Link href="/debug-auth" className="text-sm font-medium hover:text-red-600 transition-colors">
-                Debug Auth
-              </Link>
-              <Button onClick={logout} variant="outline" size="sm">
-                Logout
-              </Button>
+              <div className="flex items-center gap-2">
+                <Link href="/profile" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                  {user?.picture ? (
+                    <img 
+                      src={user.picture} 
+                      alt="Profile" 
+                      className="w-8 h-8 rounded-full object-cover border-2 border-gray-200"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-semibold">
+                      {user?.firstName?.charAt(0) || user?.username?.charAt(0) || 'U'}
+                    </div>
+                  )}
+                  <span className="text-sm text-gray-600 hidden sm:block">
+                    {user?.firstName || user?.username}
+                  </span>
+                </Link>
+                <Link href="/balance">
+                  <Button variant="ghost" size="sm">Balance</Button>
+                </Link>
+                <Button variant="outline" size="sm" onClick={logout}>
+                  Logout
+                </Button>
+              </div>
             </>
           ) : (
             <>
@@ -258,43 +264,6 @@ export default function Page() {
             </>
           )}
         </nav>
-                <div className="ml-6 flex gap-2">
-          {isAuthenticated ? (
-            <>
-              <Link href="/profile" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                {user?.picture ? (
-                  <img 
-                    src={user.picture} 
-                    alt="Profile" 
-                    className="w-8 h-8 rounded-full object-cover border-2 border-gray-200"
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-semibold">
-                    {user?.firstName?.charAt(0) || user?.username?.charAt(0) || 'U'}
-                  </div>
-                )}
-                <span className="text-sm text-gray-600 hidden sm:block">
-                  {user?.firstName || user?.username}
-                </span>
-              </Link>
-              <Link href="/balance">
-                <Button variant="ghost" size="sm">Balance</Button>
-              </Link>
-              <Button variant="ghost" size="sm" onClick={logout}>
-                Logout
-              </Button>
-            </>
-          ) : (
-            <>
-              <Link href="/signin">
-                <Button variant="ghost" size="sm">Sign In</Button>
-              </Link>
-              <Link href="/signup">
-                <Button size="sm">Sign Up</Button>
-              </Link>
-            </>
-          )}
-        </div>
       </header>
 
       <main className="flex-1">

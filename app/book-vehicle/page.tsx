@@ -149,8 +149,6 @@ export default function BookVehiclePage({
           window.location.href = '/fleet'
         }, 3000)
       } else {
-        console.log('Error response received:', data)
-        
         // Use ONLY the backend error message - no hardcoding
         if (data.error) {
           setError(data.error)
