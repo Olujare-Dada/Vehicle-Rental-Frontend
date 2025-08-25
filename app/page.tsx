@@ -134,6 +134,19 @@ function Chatbot() {
                 url: "https://runtime-api.voiceflow.com"
               },
               // Pass user information via launch event
+              assistant: {
+                header: {
+                  title: 'RentEasy',
+                  description: 'Your trusted partner for vehicle rentals. Safe, reliable, and affordable.',
+                  image: 'https://i.postimg.cc/MGpt5sGf/car-1.png'
+                },
+                inputPlaceholder: 'Ask me anything about your rental...',
+                inputIcon: {
+                  name: 'search',
+                  color: '#000000'
+                },
+                inputIconPosition: 'left',
+                inputIconSize: 20,
               launch: {
                 event: {
                   type: 'launch',
