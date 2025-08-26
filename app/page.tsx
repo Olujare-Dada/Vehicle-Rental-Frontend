@@ -51,8 +51,21 @@ function Chatbot() {
       (function(d, t) {
           var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
           v.onload = function() {
-            // Get JWT token for each request
-            const token = localStorage.getItem("jwtToken");
+            // Get JWT token from cookies first, then localStorage as fallback
+            const getToken = () => {
+              // Check cookies first (priority)
+              const cookies = document.cookie.split(';');
+              for (let cookie of cookies) {
+                const [name, value] = cookie.trim().split('=');
+                if (name === 'token') {
+                  return value;
+                }
+              }
+              // Fallback to localStorage
+              return localStorage.getItem("jwtToken");
+            };
+            
+            const token = getToken();
             
             // Prepare context with user information and JWT token
             const context = {
@@ -83,11 +96,22 @@ function Chatbot() {
                  lateFees: '${API_ENDPOINTS.lateFeesUser}',
                  lateFeesPay: '${API_ENDPOINTS.lateFeesPay}',
                },
-              // Helper functions for chatbot to use with JWT authentication
-              helpers: {
-                                 getFleetData: async (page = 0, size = 10) => {
+                             // Helper functions for chatbot to use with JWT authentication
+               helpers: {
+                 // Token retrieval function (same logic as above)
+                 getToken: () => {
+                   const cookies = document.cookie.split(';');
+                   for (let cookie of cookies) {
+                     const [name, value] = cookie.trim().split('=');
+                     if (name === 'token') {
+                       return value;
+                     }
+                   }
+                   return localStorage.getItem("jwtToken");
+                 },
+                                  getFleetData: async (page = 0, size = 10) => {
                    try {
-                     const token = localStorage.getItem("jwtToken");
+                     const token = getToken();
                      const response = await fetch('${API_ENDPOINTS.fleetAvailable}?page=' + page + '&size=' + size, {
                       headers: {
                         'Authorization': 'Bearer ' + token,
@@ -103,10 +127,10 @@ function Chatbot() {
                     return { error: error instanceof Error ? error.message : 'Unknown error' };
                   }
                 },
-                // Generic API call function with JWT authentication
-                apiCall: async (endpoint, options = {}) => {
-                  try {
-                    const token = localStorage.getItem("jwtToken");
+                                 // Generic API call function with JWT authentication
+                 apiCall: async (endpoint, options = {}) => {
+                   try {
+                     const token = getToken();
                     const response = await fetch(endpoint, {
                       ...options,
                       headers: {
@@ -188,7 +212,19 @@ function Chatbot() {
 
   // Function to get fleet data for chatbot
   const getFleetDataForChatbot = async (page = 0, size = 10) => {
-    const token = localStorage.getItem("jwtToken");
+    // Check cookies first, then localStorage
+    const getToken = () => {
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+        const [name, value] = cookie.trim().split('=');
+        if (name === 'token') {
+          return value;
+        }
+      }
+      return localStorage.getItem("jwtToken");
+    };
+    
+    const token = getToken();
     try {
       const response = await fetch(API_ENDPOINTS.fleetAvailable + '?page=' + page + '&size=' + size, {
         headers: {
