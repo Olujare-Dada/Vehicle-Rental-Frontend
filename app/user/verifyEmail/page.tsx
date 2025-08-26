@@ -30,29 +30,63 @@ export default function VerifyEmailPage() {
           redirect: 'manual', // Don't follow redirects automatically
         })
 
+        // Log response details for debugging
+        console.log('Response status:', response.status)
+        console.log('Response headers:', Object.fromEntries(response.headers.entries()))
+
+        // For 302 redirects, the status is in the Location header, not in the response body
         if (response.status === 302) {
-          // Backend redirected successfully - check the Location header
           const location = response.headers.get('Location')
-          if (location && location.includes('status=success')) {
-            setVerificationStatus('success')
-            setMessage('Your email has been successfully verified!')
-          } else if (location && location.includes('status=error')) {
-            setVerificationStatus('error')
-            const urlParams = new URLSearchParams(location.split('?')[1])
-            setMessage(urlParams.get('message') || 'Email verification failed.')
-          } else {
-            setVerificationStatus('success')
-            setMessage('Your email has been successfully verified!')
+          console.log('Location header:', location)
+          
+          if (location) {
+            // Parse the URL parameters from the Location header
+            const url = new URL(location)
+            const status = url.searchParams.get('status')
+            const message = url.searchParams.get('message')
+            
+            console.log('Parsed status:', status)
+            console.log('Parsed message:', message)
+            
+            if (status === 'success') {
+              setVerificationStatus('success')
+              setMessage('Your email has been successfully verified!')
+              return
+            } else if (status === 'error') {
+              setVerificationStatus('error')
+              setMessage(message || 'Email verification failed.')
+              return
+            }
           }
-        } else if (response.ok) {
+        }
+
+        // Handle other response statuses
+        if (response.ok) {
+          // Response is OK (200-299)
+          setVerificationStatus('success')
+          setMessage('Your email has been successfully verified!')
+        } else if (response.status === 200) {
+          // Explicit 200 status
+          setVerificationStatus('success')
+          setMessage('Your email has been successfully verified!')
+        } else if (response.status >= 200 && response.status < 300) {
+          // Any successful status code
           setVerificationStatus('success')
           setMessage('Your email has been successfully verified!')
         } else {
-          const errorData = await response.json().catch(() => ({}))
-          setVerificationStatus('error')
-          setMessage(errorData.error || 'Email verification failed. Please try again.')
+          // For non-302 responses, try to get error message
+          try {
+            const errorData = await response.json()
+            console.log('Error response data:', errorData)
+            setVerificationStatus('error')
+            setMessage(errorData.error || errorData.message || 'Email verification failed. Please try again.')
+          } catch (parseError) {
+            setVerificationStatus('error')
+            setMessage('Email verification failed. Please try again.')
+          }
         }
       } catch (error) {
+        console.error('Verification error:', error)
         setVerificationStatus('error')
         setMessage('Network error. Please check your connection and try again.')
       }
