@@ -1,127 +1,302 @@
-# Vehicle Rental Frontend
+# 🚗 RentEasy - Vehicle Rental Frontend
 
-## 🚀 **Backend Deployment Update**
+A modern, responsive vehicle rental application built with Next.js 14, React, and TypeScript. RentEasy provides an intuitive interface for users to browse vehicles, manage rentals, and handle their account operations.
 
-The frontend has been updated to use the deployed backend on Render.com instead of localhost.
+## ✨ Features
 
-### **✅ New Backend URL:**
+### 🚀 Core Functionality
+- **Vehicle Fleet Management** - Browse available vehicles with search and filtering
+- **Rental Booking System** - Book vehicles with date selection and special requests
+- **User Authentication** - Secure JWT-based authentication system
+- **Profile Management** - View rental history and manage account details
+- **Balance Management** - Add funds and view transaction history
+- **Late Fee Management** - View and pay outstanding late fees
+- **Vehicle Return System** - Return vehicles and complete rental cycles
+
+### 🎨 User Experience
+- **Responsive Design** - Mobile-first approach with Tailwind CSS
+- **Modern UI Components** - Built with shadcn/ui component library
+- **Interactive Elements** - Hover effects, loading states, and smooth transitions
+- **Accessibility** - Semantic HTML and ARIA labels
+
+### 🤖 AI Integration
+- **Voiceflow Chatbot** - Intelligent customer support with user context
+- **JWT Authentication** - Secure API communication for chatbot operations
+- **Real-time Context** - Dynamic user information and rental status
+
+## 🛠️ Technology Stack
+
+### Frontend Framework
+- **Next.js 14** - React framework with App Router
+- **React 18** - UI library with hooks
+- **TypeScript** - Type-safe JavaScript development
+
+### Styling & UI
+- **Tailwind CSS** - Utility-first CSS framework
+- **shadcn/ui** - Modern component library
+- **Lucide React** - Beautiful icon library
+
+### Authentication & State
+- **JWT Tokens** - Secure authentication
+- **Local Storage** - Client-side token storage
+- **Protected Routes** - Route-level authentication
+
+### API Integration
+- **RESTful APIs** - Backend communication
+- **Fetch API** - Modern HTTP client
+- **Error Handling** - Comprehensive error management
+
+## 📁 Project Structure
+
 ```
-https://vehicle-rental-backend-deployment.onrender.com
+vehicle_project_frontend/
+├── app/                          # Next.js App Router
+│   ├── (auth)/                  # Authentication routes
+│   │   ├── signin/             # Sign in page
+│   │   ├── signup/             # Sign up page
+│   │   └── email-verification/ # Email verification
+│   ├── balance/                 # Balance management
+│   ├── book-vehicle/           # Vehicle booking
+│   ├── fleet/                  # Vehicle fleet display
+│   ├── late-fees/              # Late fee management
+│   ├── profile/                # User profile
+│   ├── return-vehicle/         # Vehicle return
+│   └── page.tsx                # Home page
+├── components/                  # Reusable components
+│   ├── ui/                     # shadcn/ui components
+│   ├── auth/                   # Authentication components
+│   └── BackendStatus.tsx       # Backend connectivity status
+├── lib/                        # Utility libraries
+│   ├── auth.ts                 # Authentication utilities
+│   ├── config.ts               # API configuration
+│   └── utils.ts                # Helper functions
+├── public/                     # Static assets
+└── styles/                     # Global styles
 ```
 
-### **✅ Configuration Management:**
-- **Centralized Configuration**: All backend URLs are now managed in `lib/config.ts`
-- **Easy Updates**: Change the backend URL in one place (`BACKEND_URL` constant)
-- **Type Safety**: All API endpoints are properly typed and accessible
+## 🚀 Getting Started
 
-### **✅ Updated Files:**
-- `lib/config.ts` - New configuration file with all API endpoints
-- `lib/auth.ts` - Authentication utilities
-- `app/page.tsx` - Main page with chatbot integration
-- `app/profile/page.tsx` - User profile management
-- `app/fleet/page.tsx` - Vehicle fleet display
-- `app/book-vehicle/page.tsx` - Vehicle booking
-- `app/balance/page.tsx` - Balance management
-- `app/api/auth/*/route.ts` - API route handlers
+### Prerequisites
+- **Node.js** 18.0 or higher
+- **npm** or **yarn** package manager
+- **Git** for version control
 
-### **✅ API Endpoints Available:**
-```typescript
-// Authentication
-verifyToken: '/verify-token'
-login: '/login'
-signup: '/signup'
-logout: '/logout'
+### Installation
 
-// User Management
-profile: '/profile'
-profileByUsername: (username) => '/profile/{username}'
-profileUploadImage: '/profile/upload-image'
-profileEditImage: '/profile/edit-image'
-profileDeleteImage: '/profile/delete-image'
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd vehicle_project_frontend
+   ```
 
-// Fleet Management
-fleet: '/fleet'
-fleetByPage: (page, size) => '/fleet?page={page}&size={size}'
+2. **Install dependencies**
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
 
-// Rental Management
-rent: '/rent'
-rentalsUser: '/rentals/user'
+3. **Environment Configuration**
+   Create a `.env.local` file in the root directory:
+   ```env
+   NEXT_PUBLIC_BACKEND_URL=https://vehicle-rental-backend-deployment.onrender.com
+   ```
 
-// Balance Management
-balance: '/balance'
-balanceAdd: '/balance/add'
-balanceDebit: '/balance/debit'
+4. **Run the development server**
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
 
-// Vehicle Management
-vehicleById: (id) => '/vehicle/{id}'
-fleetByCategory: (categoryId) => '/fleet/category/{categoryId}'
-fleetAvailable: '/fleet/available'
+5. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
-// Return Vehicle (Future)
-returnVehicle: '/rentals/return'
+## 🔧 Configuration
+
+### Backend URLs
+The application is configured to use the production backend by default:
+- **Production**: `https://vehicle-rental-backend-deployment.onrender.com`
+- **Development**: `http://localhost:8080` (configurable)
+
+### API Endpoints
+All API endpoints are centralized in `lib/config.ts`:
+- User management and authentication
+- Vehicle fleet operations
+- Rental management
+- Balance and payment operations
+- Late fee handling
+
+## 📱 Available Routes
+
+### Public Routes
+- **`/`** - Home page with vehicle showcase
+- **`/signin`** - User authentication
+- **`/signup`** - User registration
+- **`/email-verification`** - Email verification process
+
+### Protected Routes (Require Authentication)
+- **`/profile`** - User profile and rental history
+- **`/fleet`** - Browse available vehicles
+- **`/book-vehicle`** - Book a specific vehicle
+- **`/balance`** - Manage account balance
+- **`/late-fees`** - View and pay late fees
+- **`/return-vehicle`** - Return rented vehicles
+
+## 🔐 Authentication
+
+### JWT Token Management
+- Tokens are stored in `localStorage`
+- Automatic token validation on protected routes
+- Secure API communication with Bearer tokens
+
+### User Roles
+- **Guest Users** - Can browse fleet and sign up
+- **Authenticated Users** - Full access to all features
+- **Admin Users** - Extended privileges (backend-dependent)
+
+## 🤖 Chatbot Integration
+
+### Voiceflow Configuration
+- **Project ID**: `6897b9430a2a1fc690da3cde`
+- **User Context**: Dynamic user information injection
+- **API Access**: Secure backend communication
+- **Authentication**: JWT token integration
+
+### Chatbot Features
+- User-specific rental assistance
+- Fleet information queries
+- Balance and payment support
+- Real-time context updates
+
+## 🎨 Customization
+
+### Styling
+- **Tailwind CSS** classes for rapid styling
+- **CSS Variables** for consistent theming
+- **Component variants** for different states
+
+### Components
+- **shadcn/ui** components for consistent design
+- **Custom components** for specific functionality
+- **Responsive layouts** for all screen sizes
+
+## 📦 Build & Deployment
+
+### Development Build
+```bash
+npm run dev
 ```
 
-### **✅ Usage Example:**
-```typescript
-import { API_ENDPOINTS } from '@/lib/config'
-
-// Instead of hardcoded URLs:
-// fetch('http://localhost:8080/fleet')
-
-// Use the configuration:
-fetch(API_ENDPOINTS.fleet)
-fetch(API_ENDPOINTS.fleetByPage(0, 10))
+### Production Build
+```bash
+npm run build
+npm start
 ```
 
-### **✅ Benefits:**
-1. **Easy Maintenance**: Change backend URL in one place
-2. **Type Safety**: All endpoints are properly typed
-3. **Consistency**: All components use the same configuration
-4. **Environment Support**: Easy to switch between development/staging/production
-5. **Error Prevention**: No more hardcoded URLs scattered throughout the code
+### Static Export
+```bash
+npm run export
+```
 
-### **✅ Future Updates:**
-To change the backend URL in the future:
-1. Update `BACKEND_URL` in `lib/config.ts`
-2. All components will automatically use the new URL
-3. No need to search and replace throughout the codebase
+## 🧪 Testing
+
+### Run Tests
+```bash
+npm run test
+```
+
+### Type Checking
+```bash
+npm run type-check
+```
+
+### Linting
+```bash
+npm run lint
+```
+
+## 🚀 Deployment
+
+### Netlify (Recommended)
+1. Connect your GitHub repository
+2. Set build command: `npm run build`
+3. Set publish directory: `.next`
+4. Configure environment variables
+
+### Vercel
+1. Import your GitHub repository
+2. Automatic deployment on push
+3. Built-in Next.js optimization
+
+### Other Platforms
+- **AWS Amplify** - Full-stack deployment
+- **DigitalOcean App Platform** - Scalable hosting
+- **Heroku** - Container-based deployment
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+#### Build Errors
+- Ensure Node.js version is 18+
+- Clear `node_modules` and reinstall
+- Check TypeScript compilation errors
+
+#### Authentication Issues
+- Verify JWT token storage
+- Check backend connectivity
+- Clear browser storage if needed
+
+#### Chatbot Not Loading
+- Verify Voiceflow project ID
+- Check browser console for errors
+- Ensure user is authenticated
+
+### Debug Mode
+The application includes a backend status component for development debugging.
+
+## 🤝 Contributing
+
+### Development Workflow
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+### Code Standards
+- **TypeScript** for type safety
+- **ESLint** for code quality
+- **Prettier** for code formatting
+- **Conventional commits** for version control
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **Next.js Team** - Amazing React framework
+- **shadcn/ui** - Beautiful component library
+- **Tailwind CSS** - Utility-first CSS framework
+- **Voiceflow** - AI chatbot platform
+- **Lucide** - Beautiful icon library
+
+## 📞 Support
+
+### Documentation
+- [Next.js Documentation](https://nextjs.org/docs)
+- [React Documentation](https://react.dev/)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+
+### Issues
+- Report bugs via GitHub Issues
+- Feature requests welcome
+- Security issues: please email directly
 
 ---
 
-## 🏃‍♂️ **Getting Started**
+**Built with ❤️ using Next.js, React, and TypeScript**
 
-1. **Install Dependencies:**
-   ```bash
-   npm install
-   ```
-
-2. **Run Development Server:**
-   ```bash
-   npm run dev
-   ```
-
-3. **Open Browser:**
-   Navigate to `http://localhost:3000`
-
-## 🔧 **Environment Variables**
-
-No environment variables are required for the backend URL as it's now centralized in the configuration file.
-
-## 📱 **Features**
-
-- ✅ User authentication and registration
-- ✅ Vehicle fleet browsing with filtering
-- ✅ Vehicle booking system
-- ✅ User profile management
-- ✅ Balance management
-- ✅ AI-powered chatbot integration
-- ✅ Responsive design for all devices
-- ✅ Protected routes for authenticated users
-
-## 🚗 **Backend Integration**
-
-The frontend is now fully integrated with the deployed backend on Render.com, providing:
-- Real-time vehicle availability
-- Secure user authentication
-- Persistent user data
-- Scalable infrastructure 
+*RentEasy - Your trusted partner for vehicle rentals* 
