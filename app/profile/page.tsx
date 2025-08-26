@@ -8,6 +8,7 @@ import Link from "next/link"
 import ProtectedRoute from "@/components/auth/ProtectedRoute"
 import { getToken, getCurrentUser } from "@/lib/auth"
 import { API_ENDPOINTS } from "@/lib/config"
+import EditProfileModal from "@/components/EditProfileModal"
 
 interface UserProfile {
   profileId: number;
@@ -98,6 +99,7 @@ export default function ProfilePage() {
   const [hasMoreRentals, setHasMoreRentals] = useState(true)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   useEffect(() => {
     fetchEnhancedProfile()
@@ -223,6 +225,23 @@ export default function ProfilePage() {
 
   const handleReturnVehicle = (rentalId: number) => {
     window.location.href = `/return-vehicle?rentalId=${rentalId}`
+  }
+
+  const handleEditProfile = () => {
+    setIsEditModalOpen(true)
+  }
+
+  const handleProfileUpdated = (updatedProfile: any) => {
+    // Update the local state with the new profile data
+    if (enhancedProfile) {
+      setEnhancedProfile(prev => ({
+        ...prev!,
+        profile: {
+          ...prev!.profile,
+          ...updatedProfile
+        }
+      }))
+    }
   }
 
   if (loading) {
@@ -417,6 +436,17 @@ export default function ProfilePage() {
                           {enhancedProfile.profile.headline && (
                             <p className="text-sm text-blue-600 mt-1">{enhancedProfile.profile.headline}</p>
                           )}
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex items-center gap-2"
+                            onClick={handleEditProfile}
+                          >
+                            <User className="h-4 w-4" />
+                            Edit Profile
+                          </Button>
                         </div>
                       </div>
 
@@ -774,6 +804,20 @@ export default function ProfilePage() {
             </div>
           </section>
         </main>
+
+        {/* Edit Profile Modal */}
+        <EditProfileModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          currentProfile={{
+            bio: enhancedProfile?.profile.bio || '',
+            city: enhancedProfile?.profile.city || '',
+            country: enhancedProfile?.profile.country || '',
+            headline: enhancedProfile?.profile.headline || '',
+            picture: enhancedProfile?.profile.picture || ''
+          }}
+          onProfileUpdated={handleProfileUpdated}
+        />
 
         {/* Footer */}
         <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t bg-gray-50">
