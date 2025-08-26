@@ -17,10 +17,16 @@ interface ProfileData {
   picture: string
 }
 
+interface ProfileImageData {
+  profile_image: File | null
+  user_id: string
+}
+
 interface EditProfileModalProps {
   isOpen: boolean
   onClose: () => void
   currentProfile: ProfileData
+  userId: string
   onProfileUpdated: (updatedProfile: ProfileData) => void
 }
 
@@ -28,9 +34,12 @@ export default function EditProfileModal({
   isOpen, 
   onClose, 
   currentProfile, 
+  userId,
   onProfileUpdated 
 }: EditProfileModalProps) {
   const [formData, setFormData] = useState<ProfileData>(currentProfile)
+  const [selectedImage, setSelectedImage] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -39,17 +48,60 @@ export default function EditProfileModal({
   useEffect(() => {
     if (isOpen) {
       setFormData(currentProfile)
+      setSelectedImage(null)
+      setImagePreview(null)
       setError('')
       setSuccess('')
       setValidationErrors({})
     }
   }, [isOpen, currentProfile])
 
+  // Cleanup image preview URLs on unmount
+  useEffect(() => {
+    return () => {
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview)
+      }
+    }
+  }, [imagePreview])
+
   const handleInputChange = (field: keyof ProfileData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
     // Clear validation error for this field
     if (validationErrors[field]) {
       setValidationErrors(prev => ({ ...prev, [field]: undefined }))
+    }
+  }
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setError('Please select a valid image file')
+        return
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Image file size must be less than 5MB')
+        return
+      }
+      
+      setSelectedImage(file)
+      setError('')
+      
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file)
+      setImagePreview(previewUrl)
+    }
+  }
+
+  const removeSelectedImage = () => {
+    setSelectedImage(null)
+    setImagePreview(null)
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview)
     }
   }
 
@@ -102,7 +154,32 @@ export default function EditProfileModal({
         return
       }
 
-      // Only send fields that have values (not empty strings)
+      // Handle image upload first if there's a selected image
+      if (selectedImage) {
+        const imageFormData = new FormData()
+        imageFormData.append('profile_image', selectedImage)
+        imageFormData.append('user_id', userId)
+
+        const imageResponse = await fetch(API_ENDPOINTS.profileUploadImage, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            // Don't set Content-Type for FormData - browser sets it automatically
+          },
+          body: imageFormData
+        })
+
+        if (!imageResponse.ok) {
+          const imageErrorData = await imageResponse.json()
+          throw new Error(imageErrorData.error || 'Image upload failed')
+        }
+
+        const imageData = await imageResponse.json()
+        // Update the picture field with the new image URL
+        formData.picture = imageData.imageUrl || imageData.profile?.picture || ''
+      }
+
+      // Only send profile fields that have values (not empty strings)
       const updateData: Partial<ProfileData> = {}
       Object.entries(formData).forEach(([key, value]) => {
         if (value && value.trim() !== '') {
@@ -110,33 +187,35 @@ export default function EditProfileModal({
         }
       })
 
-      const response = await fetch(API_ENDPOINTS.profileEdit, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updateData)
-      })
+      // Only make profile update request if there are fields to update
+      if (Object.keys(updateData).length > 0) {
+        const response = await fetch(API_ENDPOINTS.profileEdit, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updateData)
+        })
 
-      if (response.ok) {
-        const data = await response.json()
-        setSuccess(data.message || 'Profile updated successfully!')
-        
-        // Update the parent component with new profile data
-        onProfileUpdated(data.profile || formData)
-        
-        // Close modal after a short delay to show success message
-        setTimeout(() => {
-          onClose()
-        }, 1500)
-      } else {
-        const errorData = await response.json()
-        setError(errorData.error || `Update failed: HTTP ${response.status}`)
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || `Profile update failed: HTTP ${response.status}`)
+        }
       }
+
+      setSuccess('Profile updated successfully!')
+      
+      // Update the parent component with new profile data
+      onProfileUpdated(formData)
+      
+      // Close modal after a short delay to show success message
+      setTimeout(() => {
+        onClose()
+      }, 1500)
     } catch (error) {
       console.error('Profile update error:', error)
-      setError('Network error. Please check your connection and try again.')
+      setError(error instanceof Error ? error.message : 'Network error. Please check your connection and try again.')
     } finally {
       setLoading(false)
     }
@@ -204,24 +283,56 @@ export default function EditProfileModal({
                 </div>
               )}
 
-              {/* Profile Picture URL */}
+              {/* Profile Picture Upload */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Profile Picture URL
+                  Profile Picture
                 </label>
-                <Input
-                  type="url"
-                  placeholder="https://example.com/image.jpg"
-                  value={formData.picture}
-                  onChange={(e) => handleInputChange('picture', e.target.value)}
-                  className={validationErrors.picture ? 'border-red-500' : ''}
-                />
-                {validationErrors.picture && (
-                  <p className="text-sm text-red-600 mt-1">{validationErrors.picture}</p>
+                
+                {/* Current Image Display */}
+                {(currentProfile.picture || imagePreview) && (
+                  <div className="mb-4">
+                    <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200 border-2 border-gray-300">
+                      <img
+                        src={imagePreview || currentProfile.picture}
+                        alt="Profile Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">Current/Preview</p>
+                  </div>
                 )}
-                <p className="text-xs text-gray-500 mt-1">
-                  Leave empty to keep current picture
-                </p>
+
+                {/* File Input */}
+                <div className="space-y-3">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="cursor-pointer"
+                  />
+                  
+                  {selectedImage && (
+                    <div className="flex items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={removeSelectedImage}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        Remove Selected Image
+                      </Button>
+                      <span className="text-sm text-gray-600">
+                        {selectedImage.name} ({(selectedImage.size / 1024 / 1024).toFixed(2)} MB)
+                      </span>
+                    </div>
+                  )}
+                  
+                  <p className="text-xs text-gray-500">
+                    Supported formats: JPG, PNG, GIF. Max size: 5MB
+                  </p>
+                </div>
               </div>
 
               {/* Headline */}

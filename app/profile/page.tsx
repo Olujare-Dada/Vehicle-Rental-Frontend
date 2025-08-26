@@ -100,6 +100,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [currentUser, setCurrentUser] = useState<any>(null)
 
   useEffect(() => {
     fetchEnhancedProfile()
@@ -117,6 +118,8 @@ export default function ProfilePage() {
         setError('User not found')
         return
       }
+      
+      setCurrentUser(currentUser)
 
       const token = getToken()
       
@@ -816,6 +819,7 @@ export default function ProfilePage() {
             headline: enhancedProfile?.profile.headline || '',
             picture: enhancedProfile?.profile.picture || ''
           }}
+          userId={currentUser?.id?.toString() || ''}
           onProfileUpdated={handleProfileUpdated}
         />
 
