@@ -82,9 +82,9 @@ export default function EditProfileModal({
         return
       }
       
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setError('Image file size must be less than 5MB')
+      // Validate file size (max 15MB)
+      if (file.size > 15 * 1024 * 1024) {
+        setError('Image file size must be less than 15MB')
         return
       }
       
@@ -330,7 +330,7 @@ export default function EditProfileModal({
                   )}
                   
                   <p className="text-xs text-gray-500">
-                    Supported formats: JPG, PNG, GIF. Max size: 5MB
+                    Supported formats: JPG, PNG, GIF. Max size: 15MB
                   </p>
                 </div>
               </div>
