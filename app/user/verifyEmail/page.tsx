@@ -24,66 +24,35 @@ export default function VerifyEmailPage() {
 
     const verifyEmail = async () => {
       try {
-        // The backend expects a GET request with token as query parameter
+        // The backend now returns JSON instead of redirects
         const response = await fetch(`${API_ENDPOINTS.verifyEmail}?token=${token}`, {
           method: 'GET',
-          redirect: 'manual', // Don't follow redirects automatically
         })
 
-        // Log response details for debugging
-        console.log('Response status:', response.status)
-        console.log('Response headers:', Object.fromEntries(response.headers.entries()))
-
-        // For 302 redirects, the status is in the Location header, not in the response body
-        if (response.status === 302) {
-          const location = response.headers.get('Location')
-          console.log('Location header:', location)
-          
-          if (location) {
-            // Parse the URL parameters from the Location header
-            const url = new URL(location)
-            const status = url.searchParams.get('status')
-            const message = url.searchParams.get('message')
-            
-            console.log('Parsed status:', status)
-            console.log('Parsed message:', message)
-            
-            if (status === 'success') {
-              // Instead of setting state, redirect to the success page
-              window.location.href = location
-              return
-            } else if (status === 'error') {
-              // For errors, we can either redirect or show error state
-              // Let's redirect to the error page to be consistent
-              window.location.href = location
-              return
-            }
-          }
-        }
-
-        // Handle other response statuses
         if (response.ok) {
-          // Response is OK (200-299)
-          setVerificationStatus('success')
-          setMessage('Your email has been successfully verified!')
-        } else if (response.status === 200) {
-          // Explicit 200 status
-          setVerificationStatus('success')
-          setMessage('Your email has been successfully verified!')
-        } else if (response.status >= 200 && response.status < 300) {
-          // Any successful status code
-          setVerificationStatus('success')
-          setMessage('Your email has been successfully verified!')
+          // Success response (200 OK)
+          const data = await response.json()
+          console.log('Success response:', data)
+          
+          if (data.status === 'success') {
+            setVerificationStatus('success')
+            setMessage(data.message || 'Your email has been successfully verified!')
+          } else {
+            setVerificationStatus('error')
+            setMessage(data.message || 'Email verification failed.')
+          }
         } else {
-          // For non-302 responses, try to get error message
+          // Error response (4xx, 5xx)
           try {
             const errorData = await response.json()
-            console.log('Error response data:', errorData)
+            console.log('Error response:', errorData)
+            
             setVerificationStatus('error')
-            setMessage(errorData.error || errorData.message || 'Email verification failed. Please try again.')
+            setMessage(errorData.message || 'Email verification failed. Please try again.')
           } catch (parseError) {
+            // If can't parse JSON, use generic error message
             setVerificationStatus('error')
-            setMessage('Email verification failed. Please try again.')
+            setMessage(`Email verification failed. HTTP ${response.status}`)
           }
         }
       } catch (error) {
