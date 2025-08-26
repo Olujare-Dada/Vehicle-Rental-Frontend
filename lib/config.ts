@@ -20,7 +20,7 @@ export const API_ENDPOINTS = {
   // Profile Image Management (updated to match your specs)
   profileUploadImage: `${BACKEND_URL}/profile/upload-image`,
   profileEditImage: `${BACKEND_URL}/profile/edit-image`,
-  profileEdit: `${BACKEND_URL}/profile/edit`,
+  profileEdit: `${BACKEND_URL}/profile`,
   profileDeleteImage: `${BACKEND_URL}/profile/delete-image`,
 
   // Fleet Management

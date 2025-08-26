@@ -82,9 +82,9 @@ export default function EditProfileModal({
         return
       }
       
-      // Validate file size (max 15MB)
-      if (file.size > 15 * 1024 * 1024) {
-        setError('Image file size must be less than 15MB')
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        setError('Image file size must be less than 10MB')
         return
       }
       
@@ -108,11 +108,6 @@ export default function EditProfileModal({
   const validateForm = (): boolean => {
     const errors: Partial<ProfileData> = {}
     
-    // Validate picture URL if provided
-    if (formData.picture && !isValidUrl(formData.picture)) {
-      errors.picture = 'Please enter a valid URL'
-    }
-    
     // Validate bio length
     if (formData.bio && formData.bio.length > 500) {
       errors.bio = 'Bio must be less than 500 characters'
@@ -127,14 +122,7 @@ export default function EditProfileModal({
     return Object.keys(errors).length === 0
   }
 
-  const isValidUrl = (string: string): boolean => {
-    try {
-      new URL(string)
-      return true
-    } catch (_) {
-      return false
-    }
-  }
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -187,16 +175,16 @@ export default function EditProfileModal({
         }
       })
 
-      // Only make profile update request if there are fields to update
-      if (Object.keys(updateData).length > 0) {
-        const response = await fetch(API_ENDPOINTS.profileEdit, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updateData)
-        })
+                           // Only make profile update request if there are fields to update
+        if (Object.keys(updateData).length > 0) {
+          const response = await fetch(API_ENDPOINTS.profileEdit, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updateData)
+          })
 
         if (!response.ok) {
           const errorData = await response.json()
@@ -330,7 +318,7 @@ export default function EditProfileModal({
                   )}
                   
                   <p className="text-xs text-gray-500">
-                    Supported formats: JPG, PNG, GIF. Max size: 15MB
+                    Supported formats: JPG, PNG, GIF. Max size: 10MB
                   </p>
                 </div>
               </div>
