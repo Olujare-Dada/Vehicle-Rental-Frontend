@@ -65,7 +65,8 @@ function Chatbot() {
                },
               auth: {
                 token: token || 'no-token',
-                isAuthenticated: !!token
+                isAuthenticated: !!token,
+                jwt_token: token || 'no-token'
               },
               session: {
                 timestamp: new Date().toISOString(),
@@ -156,7 +157,9 @@ function Chatbot() {
                        user_email: '${user?.email || 'unknown'}',
                        user_first_name: '${user?.firstName || 'unknown'}',
                        user_last_name: '${user?.lastName || 'unknown'}',
-                       user_id: '${user?.id || 'unknown'}'
+                       user_id: '${user?.id || 'unknown'}',
+                       jwt_token: token || 'no-token',
+                       is_authenticated: !!token
                      }
                    }
                  }
