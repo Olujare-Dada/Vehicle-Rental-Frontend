@@ -49,12 +49,13 @@ export default function VerifyEmailPage() {
             console.log('Parsed message:', message)
             
             if (status === 'success') {
-              setVerificationStatus('success')
-              setMessage('Your email has been successfully verified!')
+              // Instead of setting state, redirect to the success page
+              window.location.href = location
               return
             } else if (status === 'error') {
-              setVerificationStatus('error')
-              setMessage(message || 'Email verification failed.')
+              // For errors, we can either redirect or show error state
+              // Let's redirect to the error page to be consistent
+              window.location.href = location
               return
             }
           }
